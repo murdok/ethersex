@@ -78,6 +78,10 @@ static void __zbus_txstart(void) {
 #ifdef HAVE_ZBUS_RXTX_PIN
   PIN_SET(ZBUS_RXTX_PIN);
 #endif 
+#ifdef HAVE_ZBUS_DE_PIN
+  PIN_SET(ZBUS_RE_PIN);
+  PIN_SET(ZBUS_DE_PIN);
+#endif
 
   /* reset tx interrupt flag */
   usart(UCSR,A) |= _BV(usart(TXC));
@@ -115,6 +119,10 @@ zbus_rxstart (void)
 #ifdef HAVE_ZBUS_RXTX_PIN
   PIN_CLEAR(ZBUS_RXTX_PIN);
 #endif
+#ifdef HAVE_ZBUS_DE_PIN
+  PIN_CLEAR(ZBUS_DE_PIN);
+  PIN_CLEAR(ZBUS_RE_PIN);
+#endif
 
   SREG = sreg;
 }
@@ -147,6 +155,10 @@ zbus_core_init(void)
     /* Enable RX/TX Swtich as Output */
 #ifdef HAVE_ZBUS_RXTX_PIN
     DDR_CONFIG_OUT(ZBUS_RXTX_PIN);
+#endif
+#ifdef HAVE_ZBUS_DE_PIN
+    DDR_CONFIG_OUT(ZBUS_RE_PIN);
+    DDR_CONFIG_OUT(ZBUS_DE_PIN);
 #endif
 
     /* clear the buffers */
@@ -207,7 +219,8 @@ SIGNAL(usart(USART,_TX_vect))
   else {
     bus_blocked = 0;
 		#ifdef ZBUS_TX_PIN
-		PIN_CLEAR(STATUSLED_TX);
+//		PIN_CLEAR(STATUSLED_TX);
+		PIN_CLEAR(ZBUS_TX_PIN);
 		#endif
     zbus_txlen = 0;
     zbus_rxstart ();
@@ -251,7 +264,8 @@ SIGNAL(usart(USART,_RX_vect))
 				zbus_rxlen = zbus_index;
       }
 			#ifdef ZBUS_RX_PIN
-			PIN_CLEAR(STATUSLED_RX);
+//			PIN_CLEAR(STATUSLED_RX);
+			PIN_CLEAR(ZBUS_RX_PIN);
 			#endif
 
       /* force bus free even if we didn't catch the start condition. */
@@ -268,7 +282,8 @@ SIGNAL(usart(USART,_RX_vect))
 
     recv_escape_data = 1;
 		#ifdef ZBUS_RX_PIN
-		PIN_SET(STATUSLED_RX);
+//		PIN_SET(STATUSLED_RX);
+		PIN_SET(ZBUS_RX_PIN);
 		#endif
 		ACTIVITY_LED_ZBUS_RX;
   }
