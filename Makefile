@@ -43,6 +43,7 @@ SUBDIRS += hardware/storage/sd_reader
 SUBDIRS += hardware/zacwire
 SUBDIRS += hardware/ultrasonic
 SUBDIRS += hardware/hbridge
+SUBDIRS += hardware/btn_4way
 SUBDIRS += protocols/artnet
 SUBDIRS += protocols/bootp
 SUBDIRS += protocols/dmx
@@ -245,6 +246,7 @@ embed/%: embed/%.sh
 
 %.bin: % $(INLINE_FILES)
 	$(OBJCOPY) -O binary -R .eeprom $< $@
+	cp -av $(TARGET) $(TARGET).elf
 ifeq ($(VFS_INLINE_SUPPORT),y)
 	@$(MAKE) -C core/vfs vfs-concat TOPDIR=../.. no_deps=t
 	$(CONFIG_SHELL) core/vfs/do-embed $(INLINE_FILES)

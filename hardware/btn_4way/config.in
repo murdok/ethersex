@@ -1,0 +1,3 @@
+
+dep_bool "4Way Button module driver" BTN_4WAY_SUPPORT
+
