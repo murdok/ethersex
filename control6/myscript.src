@@ -78,13 +78,13 @@ MENU(COLS, 0, 0, "***  Menu  ***",
 		SUBMENU("** Submenu **",
 dnl			MENUEDIT_INT("Integertest_2", EinWert, 0, 50)
 dnl			MENUEDIT_INT("3rd Integer", EinWert, 0, 50)
-			SUBMENU_2("* SubSubMenu *",
+dnl			SUBMENU_2("* SubSubMenu *",
 dnl				MENUEDIT_INT("1W-Temp1", onewire_temp1, -10, 10)
 dnl				MENUEDIT_INT("1W-Temp2", onewire_temp2, -10, 10)
 dnl				MENUEDIT_INT("1W-Temp3", onewire_temp3, -10, 10)
 dnl				MENUITEM("Back")
-			)
-dnl			MENUITEM("Back")
+dnl			)
+			MENUITEM("Back")
 		)
 	MENUITEM("Exit")
 )
