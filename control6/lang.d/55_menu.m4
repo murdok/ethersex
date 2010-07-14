@@ -54,6 +54,7 @@ dnl Menuitem helper macro.  Probably you want to derive your menuitem
 dnl implementations from this one.
 define(`_MENUITEM', `
 define(`thismenu', `menu'__line__)thismenu:
+	/* handler for menuitem $1 */
 	`_MENU_PRINT_MAIN($1)'
 
 	/* Read byte from TTY input buffer */
@@ -89,13 +90,48 @@ dnl SUBMENU(NAME, ITEMS)
 dnl ==========================================================================
 define(`SUBMENU', `dnl
 define(`submenu', `submenu_name'__line__)dnl
-`define(`old_divert', divnum)dnl
+`define(`old_divert_submenu', divnum)dnl
+/* DIVNUM_old_sub: divnum */
 divert(globals_divert)dnl
-	`const char PROGMEM' submenu[] = $1;
-divert(old_divert)'dnl
+/* DIVNUM_glb: divnum */
+	const char PROGMEM 'submenu`[] = $1;
+divert(5)'dnl
+divert(5)dnl
+/* DIVNUM_old_rev_sub: divnum */
 	_MENUITEM(`submenu', `dnl
 		`submenu_activate'__line__:
 		_MENU_PRINT_PARENT(submenu)
+
+		#undef prevmenu
+		`#define prevmenu' `submenu_activate'__line__
+
+		/* Items of sub-menu $1 */
+		$2
+		/* End of sub-menu $1 */
+
+		goto prevmenu;
+		#undef prevmenu
+		`#define prevmenu' `menu'__line__
+')')
+
+
+
+dnl ==========================================================================
+dnl SUBMENU_2(NAME, ITEMS)
+dnl ==========================================================================
+define(`SUBMENU_2', `dnl
+define(`submenu_2', `submenu_name'__line__)dnl
+`define(`old_divert_submenu_2', divnum)dnl
+/* DIVNUM_old: divnum */
+divert(globals_divert)dnl
+/* DIVNUM_glb: divnum */
+	const char PROGMEM 'submenu`[] = $1;
+divert(old_divert_submenu_2)'dnl
+divert(5)dnl
+/* DIVNUM_old_rev: divnum */
+	_MENUITEM(`submenu_2', `dnl
+		`submenu_activate'__line__:
+		_MENU_PRINT_PARENT(submenu_2)
 
 		#undef prevmenu
 		`#define prevmenu' `submenu_activate'__line__
@@ -116,16 +152,20 @@ dnl MENUEDIT_BOOL(NAME, VARIABLE)
 dnl ==========================================================================
 define(`MENUEDIT_BOOL', `dnl
 define(`editbool_mi', `editbool_name'__line__)dnl
-`define(`old_divert', divnum)dnl
+`define(`old_divert_menu_bool', divnum)dnl
+/* DIVNUM_old_bool: divnum */
 divert(globals_divert)
+/* DIVNUM_glb_bool: divnum */
 ifdef(`menuedit_bool_used', `', `dnl
-const char PROGMEM menuedit_bool_enabled[] = "Enabled";
-const char PROGMEM menuedit_bool_disabled[] = "Disabled";
-uint8_t menuedit_bool_state;
+//const char PROGMEM menuedit_bool_enabled[] = "Enabled";
+//const char PROGMEM menuedit_bool_disabled[] = "Disabled";
+//uint8_t menuedit_bool_state;
 define(`menuedit_bool_used')')
 divert(globals_divert)dnl
+/* DIVNUM_glb_bool2: divnum */
 	const char PROGMEM 'editbool_mi`[] = $1;
-divert(old_divert)'dnl
+divert(old_divert_menu_bool)'dnl
+/* DIVNUM_old_rev_bool: divnum */
 	_MENUITEM(editbool_mi, `dnl
 		menuedit_bool_state = $2;
 		_MENU_PRINT_PARENT(editbool_mi)
@@ -142,7 +182,7 @@ divert(old_divert)'dnl
 		}
 
 		else if (ch == 10) 	/* return -> action */
-			{ $2 = menuedit_bool_state; _MENU_EXIT() }
+			{ $2 = menuedit_bool_state; goto prevlevel; /*_MENU_EXIT()*/ }
 
 		/* invalid response -> ignore */
 		`goto boolthing_activate'__line__;
@@ -155,14 +195,18 @@ dnl MENUEDIT_INT(NAME, VARIABLE, MIN, MAX)
 dnl ==========================================================================
 define(`MENUEDIT_INT', `dnl
 define(`editint_mi', `editint_name'__line__)dnl
-`define(`old_divert', divnum)dnl
+`define(`old_divert_menu_int', divnum)dnl
+/* DIVNUM_old_int: divnum */
 divert(globals_divert)
+/* DIVNUM_glb_int: divnum */
 ifdef(`menuedit_int_used', `', `dnl
-uint8_t menuedit_int_state;
+//uint8_t menuedit_int_state;
 define(`menuedit_int_used')')
 divert(globals_divert)dnl
+/* DIVNUM_glb_int2: divnum */
 	const char PROGMEM 'editint_mi`[] = $1;
-divert(old_divert)'dnl
+divert(old_divert_menu_int)'dnl
+/* DIVNUM_old_rev_int: divnum */
 	_MENUITEM(editint_mi, `dnl
 		menuedit_int_state = $2;
 		_MENU_PRINT_PARENT(editint_mi)
@@ -173,10 +217,10 @@ divert(old_divert)'dnl
 		{ uint8_t ch;
 		PT_WAIT_UNTIL(pt, (ch = TTY_GETCH()));
 
-		if (ch == 106 && menuedit_int_state < $4)
+		if (ch == 107 && menuedit_int_state < $4)
 			menuedit_int_state ++;
 
-		else if (ch == 107 && menuedit_int_state > $3)
+		else if (ch == 106 && menuedit_int_state > $3)
 			menuedit_int_state --;
 
 		else if (ch == 10) 	/* return -> action */
@@ -191,18 +235,26 @@ dnl ==========================================================================
 dnl MENU(WIDTH, Y, X, NAME, ITEMS)
 dnl ==========================================================================
 define(`MENU', `
-define(`old_divert', divnum)dnl
+define(`old_divert_menu', divnum)dnl
+/* DIVNUM_old_menu: divnum (old_divert_menu)*/
 divert(init_divert)dnl
         TTY_CREATE_WINDOW_NOSEL(menu, 2, $1, $2, $3)
 
 divert(globals_divert)dnl
 	`const char PROGMEM parent_menu_name'__line__[] = $4;
-divert(old_divert)dnl
+const char PROGMEM menuedit_bool_enabled[] = "Enabled";
+const char PROGMEM menuedit_bool_disabled[] = "Disabled";
+uint8_t menuedit_bool_state;
+uint8_t menuedit_int_state;
 
+divert(old_divert_menu)dnl
+/* DIVNUM_old_rev_menu: divnum (old_divert_menu)*/
 	THREAD(menu)
 rootmenu:
 #undef prevmenu
 #define prevmenu rootmenu
+#undef prevlevel
+#define prevlevel rootmenu
 	{
 		_MENU_PRINT_PARENT(`parent_menu_name'__line__)
 
