@@ -41,10 +41,10 @@ static uint8_t btn_4way_state_hist = 0;
 void btn_4way_main(void)
 {
 	btn_4way_state = 0;
-	if (PIN_HIGH(BTN_4WAY_LEFT))	btn_4way_state |= _BV(0);
-	if (PIN_HIGH(BTN_4WAY_UP))   	btn_4way_state |= _BV(1);
-	if (PIN_HIGH(BTN_4WAY_RIGHT))	btn_4way_state |= _BV(2);
-	if (PIN_HIGH(BTN_4WAY_DOWN))	btn_4way_state |= _BV(3);
+	if (!PIN_HIGH(BTN_4WAY_LEFT))	btn_4way_state |= _BV(0);
+	if (!PIN_HIGH(BTN_4WAY_UP))   	btn_4way_state |= _BV(1);
+	if (!PIN_HIGH(BTN_4WAY_RIGHT))	btn_4way_state |= _BV(2);
+	if (!PIN_HIGH(BTN_4WAY_DOWN))	btn_4way_state |= _BV(3);
 
 	if (btn_4way_state != btn_4way_state_hist)
 	{
@@ -71,6 +71,10 @@ void btn_4way_init(void)
 	DDR_CONFIG_IN(BTN_4WAY_UP);
 	DDR_CONFIG_IN(BTN_4WAY_RIGHT);
 	DDR_CONFIG_IN(BTN_4WAY_DOWN);
+	PIN_SET(BTN_4WAY_LEFT);
+	PIN_SET(BTN_4WAY_UP);
+	PIN_SET(BTN_4WAY_RIGHT);
+	PIN_SET(BTN_4WAY_DOWN);
 
 	btn_4way_state = 0;
 }

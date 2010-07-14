@@ -39,20 +39,20 @@ THREAD(update_var)
 dnl	WAIT(2)
 	TTY_SELECT(wert)
 	TTY_HOME()
-	onewire_temp1 = ONEWIRE_READ(1030c5c8000000c3);
+dnl	onewire_temp1 = ONEWIRE_READ(1030c5c8000000c3);
 	TTY_WRITE(`"T:%2d.%1dC"', (onewire_temp1/10), (onewire_temp1%10))
 
-	TTY_SELECT(wert2)
-	TTY_HOME()
-	onewire_temp2 = ONEWIRE_READ(2830c5b80000008e);
+dnl	TTY_SELECT(wert2)
+dnl	TTY_HOME()
+dnl	onewire_temp2 = ONEWIRE_READ(2830c5b80000008e);
 dnl	TTY_WRITE(`"T2: %2d.%1d Grad"', (onewire_temp2/10), (onewire_temp2%10))
 
-	TTY_SELECT(wert3)
-	TTY_HOME()
-	onewire_temp3 = ONEWIRE_READ(2230c5b800000005);
+dnl	TTY_SELECT(wert3)
+dnl	TTY_HOME()
+dnl	onewire_temp3 = ONEWIRE_READ(2230c5b800000005);
 dnl	TTY_WRITE(`"T3: %2d.%1d Grad"', (onewire_temp3/10), (onewire_temp3%10))
 
-	ONEWIRE_CONVERT();
+dnl	ONEWIRE_CONVERT();
 	}
 dnl	UDP_DIRECT_SEND(192.168.101.131, 27101, 2701, `"T:%2d C -=- EinWert:%d\n"', temp_wert, EinWert)
 dnl	UDP_DIRECT_SEND(192.168.101.131, 27101, 2701, `"help\n"')
